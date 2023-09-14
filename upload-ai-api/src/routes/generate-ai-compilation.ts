@@ -1,0 +1,25 @@
+import { prisma } from './../lib/prisma'
+import { FastifyInstance } from 'fastify'
+import { z } from 'zod'
+
+export async function generateAiCompilationRoute(app: FastifyInstance) {
+  app.post('/ai/openai', async (req, reply) => {
+    const bodySchema = z.object({
+      videoId: z.string().uuid(),
+      template: z.string(),
+      temperature: z.number().min(0).max(1).default(0.5),
+    })
+
+    const { temperature, template, videoId } = bodySchema.parse(req.body)
+    const video = await prisma.video.findUniqueOrThrow({
+      where: {
+        id: videoId,
+      },
+    })
+
+    if (!video.transcription) {
+      return reply.status(400).send({ error: 'Video has no transcription yet' })
+    }
+    return { temperature, template, videoId }
+  })
+}
