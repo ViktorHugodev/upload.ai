@@ -1,6 +1,7 @@
 import { prisma } from './../lib/prisma'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { openai } from '../lib/openai'
 
 export async function generateAiCompilationRoute(app: FastifyInstance) {
   app.post('/ai/openai', async (req, reply) => {
@@ -20,6 +21,14 @@ export async function generateAiCompilationRoute(app: FastifyInstance) {
     if (!video.transcription) {
       return reply.status(400).send({ error: 'Video has no transcription yet' })
     }
-    return { temperature, template, videoId }
+    const promptMessage = template.replace('{transcription}', video.transcription)
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo-16k',
+      temperature,
+      messages: [{ role: 'user', content: promptMessage }],
+    })
+
+    return response
   })
 }
