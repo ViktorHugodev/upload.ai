@@ -3,18 +3,70 @@ import { Separator } from '@radix-ui/react-separator'
 import { FileVideo, Upload } from 'lucide-react'
 import { Button } from './ui/button'
 import { Textarea } from './ui/textarea'
-import { ChangeEvent, useMemo, useState } from 'react'
+import { ChangeEvent, FormEvent, FormEventHandler, useMemo, useRef, useState } from 'react'
+import { getFFmpeg } from '@/lib/ffmpeg'
+import { fetchFile } from '@ffmpeg/util'
 
 export function VideoInputForm() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
-  function handleFileUpload(event: ChangeEvent<HTMLInputElement>) {
+  const promptInputRef = useRef<HTMLTextAreaElement>(null)
+  function handleFileSelected(event: ChangeEvent<HTMLInputElement>) {
     const { files } = event.currentTarget
+
     if (!files) {
       return
     }
 
     const selectedFile = files[0]
+
     setVideoFile(selectedFile)
+  }
+
+  async function convertVideoToAudio(video: File) {
+    console.log('Convert started')
+
+    const ffmpeg = await getFFmpeg()
+
+    await ffmpeg.writeFile('input.mp4', await fetchFile(video))
+
+    // ffmpeg.on('log', log => {
+    //   console.log('log geral', log)
+    // })
+
+    ffmpeg.on('progress', progress => {
+      console.log('Convert progress', Math.floor(progress.progress * 100))
+    })
+
+    await ffmpeg.exec([
+      '-i',
+      'input.mp4',
+      '-map',
+      '0:a',
+      '-b:a',
+      '20k',
+      '-acodec',
+      'libmp3lame',
+      'output.mp3',
+    ])
+
+    const data = await ffmpeg.readFile('output.mp3')
+
+    const audioFileBlob = new Blob([data], { type: 'audio/mpeg' })
+    const audioFile = new File([audioFileBlob], 'audio.mp3', { type: 'audio/mpeg' })
+
+    console.log('convert finish')
+    return audioFile
+  }
+  async function handleUploadVideo(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const prompt = promptInputRef.current?.value
+    console.log('🚀 ~ file: video-input-form.tsx:64 ~ handleUploadVideo ~ prompt:', prompt)
+
+    if (!videoFile) return
+
+    const audioFile = await convertVideoToAudio(videoFile)
+    console.log('🚀 ~ file: video-input-form.tsx:58 ~ handleUploadVideo ~ audioFile:', audioFile)
   }
 
   const previewFile = useMemo(() => {
@@ -25,14 +77,18 @@ export function VideoInputForm() {
   }, [videoFile])
 
   return (
-    <form className='space-y-6'>
+    <form className='space-y-6' onSubmit={handleUploadVideo}>
       <label
         htmlFor='video'
         className='border flex relative rounded-md aspect-video cursor-pointer border-dashed text-sm flex-col
       items-center justify-center text-muted-foreground hover:bg-primary/10'
       >
         {previewFile ? (
-          <video src={previewFile} controls={false} className='pointer-events-none absolute inset-0' />
+          <video
+            src={previewFile}
+            controls={false}
+            className='pointer-events-none absolute inset-0'
+          />
         ) : (
           <>
             <FileVideo className='h-4 w-4' />
@@ -40,13 +96,20 @@ export function VideoInputForm() {
           </>
         )}
       </label>
-      <input type='file' id='video' accept='video/mp4' className='sr-only' onChange={handleFileUpload} />
+      <input
+        type='file'
+        id='video'
+        accept='video/mp4'
+        className='sr-only'
+        onChange={handleFileSelected}
+      />
 
       <Separator />
 
       <div className='space-2-1'>
         <Label htmlFor='transcription_prompt'>Prompt de descrição</Label>
         <Textarea
+          ref={promptInputRef}
           id='transcription_prompt'
           className='h-20 leading-relaxed'
           placeholder='Inclua palavras-chave mencionadas no vídeo separadas por vírgula (,)'
