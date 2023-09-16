@@ -8,6 +8,10 @@ import { getFFmpeg } from '@/lib/ffmpeg'
 import { fetchFile } from '@ffmpeg/util'
 import { api } from '@/lib/axios'
 
+interface VideoInputFormProps {
+  onVideoIdSelect: (videoId: string) => void
+}
+
 const statusMessages = {
   converting: 'Convertendo...',
   uploading: 'Carregando...',
@@ -16,9 +20,10 @@ const statusMessages = {
 }
 type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success'
 
-export function VideoInputForm() {
+export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [status, setStatus] = useState<Status>('waiting')
+
   const promptInputRef = useRef<HTMLTextAreaElement>(null)
   function handleFileSelected(event: ChangeEvent<HTMLInputElement>) {
     const { files } = event.currentTarget
@@ -75,24 +80,33 @@ export function VideoInputForm() {
     if (!videoFile) return
 
     setStatus('converting')
+
     const audioFile = await convertVideoToAudio(videoFile)
+
     const data = new FormData()
+
     data.append('file', audioFile)
 
     setStatus('uploading')
+
     const response = await api.post('/video', data)
+
     const videoId = response.data.video.id
 
     setStatus('generating')
+
     const dataTranscription = await api.post(`/video/${videoId}/transcription`, {
       prompt,
     })
+
     console.log(
       '🚀 ~ file: video-input-form.tsx:78 ~ handleUploadVideo ~ dataTranscription:',
       dataTranscription,
     )
+
     setStatus('success')
-    // console.log('🚀 ~ file: video-input-form.tsx:58 ~ handleUploadVideo ~ audioFile:', audioFile)
+
+    onVideoIdSelect(videoId)
   }
 
   const previewFile = useMemo(() => {
