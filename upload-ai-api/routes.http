@@ -14,11 +14,11 @@ Content-Type: audio/mpeg
 
 
 ###
-POST http://localhost:3333/video/00d79d93-c23f-4c1d-8d25-dcd8d51be3a4/transcription
+POST http://localhost:3333/video/b33f51cf-e2cf-49d5-ad68-558cd03ceacc/transcription
 Content-Type: application/json
 
 {
-  "prompt": "obrigado, deus",
+  "prompt": "cientistas, descobertas, vírus",
   "videoId": "00d79d93-c23f-4c1d-8d25-dcd8d51be3a4"
 }
 

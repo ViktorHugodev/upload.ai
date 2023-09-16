@@ -6,6 +6,7 @@ import { Textarea } from './ui/textarea'
 import { ChangeEvent, FormEvent, FormEventHandler, useMemo, useRef, useState } from 'react'
 import { getFFmpeg } from '@/lib/ffmpeg'
 import { fetchFile } from '@ffmpeg/util'
+import { api } from '@/lib/axios'
 
 export function VideoInputForm() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -66,7 +67,21 @@ export function VideoInputForm() {
     if (!videoFile) return
 
     const audioFile = await convertVideoToAudio(videoFile)
-    console.log('🚀 ~ file: video-input-form.tsx:58 ~ handleUploadVideo ~ audioFile:', audioFile)
+    const data = new FormData()
+    data.append('file', audioFile)
+
+    const response = await api.post('/video', data)
+    const videoId = response.data.video.id
+
+    const dataTranscription = await api.post(`/video/${videoId}/transcription`, {
+      prompt,
+    })
+    console.log(
+      '🚀 ~ file: video-input-form.tsx:78 ~ handleUploadVideo ~ dataTranscription:',
+      dataTranscription,
+    )
+
+    // console.log('🚀 ~ file: video-input-form.tsx:58 ~ handleUploadVideo ~ audioFile:', audioFile)
   }
 
   const previewFile = useMemo(() => {
