@@ -5,7 +5,7 @@ import { uploadVideo } from './routes/post-video'
 import { createVideoTranscription } from './routes/create-transcription'
 import { generateAiCompilationRoute } from './routes/generate-ai-compilation'
 import fastifyCors from '@fastify/cors'
-import { downloadMP3FromS3, getMp3S3, localFilePath, s3 } from './lib/s3'
+import { downloadMP3FromS3, localFilePath, s3 } from './lib/s3'
 import { Readable, pipeline } from 'stream'
 import { promisify } from 'util'
 const app = fastify()

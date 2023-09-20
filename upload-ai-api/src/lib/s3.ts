@@ -28,22 +28,7 @@ export async function uploadFileS3(binaryData: Buffer, key: string) {
 const tempDirectory = path.join(__dirname, '../../tmp')
 const fileName = 'temp.mp3'
 export const localFilePath = path.join(tempDirectory, fileName)
-export async function getMp3S3(key: string) {
-  try {
-    const downloadParams = {
-      Bucket: bucketName,
-      Key: key,
-    }
-    console.log('🚀 ~ file: s3.ts:32 ~ getMp3S3 ~ downloadParams.key:', downloadParams.Key)
-    const result = await s3.getObject(downloadParams).createReadStream()
-    console.log('🚀 ~ file: s3.ts:33 ~ getMp3S3 ~ result:', result)
 
-    return result
-  } catch (error) {
-    console.error('Erro ao fazer o download do arquivo da S3:', error)
-    throw error
-  }
-}
 export async function downloadMP3FromS3(objectKey: string): Promise<void> {
   const params = {
     Bucket: bucketName, // Substitua pelo nome do seu bucket S3
@@ -56,8 +41,7 @@ export async function downloadMP3FromS3(objectKey: string): Promise<void> {
 
     // Salvar o arquivo MP3 localmente
     fs.writeFileSync(localFilePath, mp3Data)
-
-    console.log(`Arquivo MP3 baixado e salvo em: ${localFilePath}`)
+    console.log('ln 60 localGile mp3Data', { localFilePath, mp3Data })
   } catch (error) {
     console.error(`Erro ao baixar o arquivo MP3: ${error}`)
     throw error

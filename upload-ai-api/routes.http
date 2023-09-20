@@ -14,12 +14,12 @@ Content-Type: audio/mpeg
 
 
 ###
-POST http://localhost:3333/video/3cbce8f0-8a20-483f-bdab-52b867ad2434/transcription
+POST http://localhost:3333/video/92d25227-a64e-4c99-9301-eefb91d439dc/transcription
 Content-Type: application/json
 
 {
   "prompt": "cientistas, descobertas, vírus",
-  "videoId": "3cbce8f0-8a20-483f-bdab-52b867ad2434"
+  "videoId": "92d25227-a64e-4c99-9301-eefb91d439dc"
 }
 
 ###
