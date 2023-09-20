@@ -1,5 +1,7 @@
 import 'dotenv/config'
+import fs from 'node:fs'
 import { S3 } from 'aws-sdk'
+import path from 'node:path'
 
 const bucketName = process.env.AWS_BUCKET_NAME as string
 const region = process.env.AWS_REGION
@@ -18,11 +20,14 @@ export async function uploadFileS3(binaryData: Buffer, key: string) {
     Body: binaryData,
     Key: key,
     ACL: 'public-read',
-    // Content-Type: 'audio/mpeg',
+    ContentType: 'audio/mpeg',
   }
   return await s3.upload(uploadParams).promise()
 }
 
+const tempDirectory = path.join(__dirname, '../../tmp')
+const fileName = 'temp.mp3'
+export const localFilePath = path.join(tempDirectory, fileName)
 export async function getMp3S3(key: string) {
   try {
     const downloadParams = {
@@ -36,6 +41,25 @@ export async function getMp3S3(key: string) {
     return result
   } catch (error) {
     console.error('Erro ao fazer o download do arquivo da S3:', error)
+    throw error
+  }
+}
+export async function downloadMP3FromS3(objectKey: string): Promise<void> {
+  const params = {
+    Bucket: bucketName, // Substitua pelo nome do seu bucket S3
+    Key: objectKey,
+  }
+
+  try {
+    const s3Object = await s3.getObject(params).promise()
+    const mp3Data = s3Object.Body as Buffer
+
+    // Salvar o arquivo MP3 localmente
+    fs.writeFileSync(localFilePath, mp3Data)
+
+    console.log(`Arquivo MP3 baixado e salvo em: ${localFilePath}`)
+  } catch (error) {
+    console.error(`Erro ao baixar o arquivo MP3: ${error}`)
     throw error
   }
 }
