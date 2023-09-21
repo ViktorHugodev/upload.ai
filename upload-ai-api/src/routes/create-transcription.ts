@@ -13,6 +13,9 @@ import * as fs from 'fs'
 const pipelineAsync = promisify(pipeline)
 export async function createVideoTranscription(app: FastifyInstance) {
   app.post('/video/:videoId/transcription', async (req, reply) => {
+    reply.header('Access-Control-Allow-Origin', '*')
+    reply.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    reply.header('Access-Control-Allow-Headers', '*')
     const paramsSchema = z.object({
       videoId: z.string().uuid(),
     })
@@ -22,31 +25,31 @@ export async function createVideoTranscription(app: FastifyInstance) {
 
     const { videoId } = paramsSchema.parse(req.params)
     const { prompt } = bodySchema.parse(req.body)
+    console.log('🚀 ~ file: create-transcription.ts:25 ~ app.post ~ prompt-videoId:', {
+      prompt,
+      videoId,
+    })
 
     const video = await prisma.video.findUniqueOrThrow({
       where: {
         id: videoId,
       },
     })
+    console.log('🚀 ~ file: create-transcription.ts:32 ~ app.post ~ video:', video)
 
     const s3ObjectKey = video.key as string
-    console.log('🚀 ~ file: create-transcription.ts:33 ~ app.post ~ s3ObjectKey:', s3ObjectKey)
 
     await downloadMP3FromS3(s3ObjectKey)
 
     // Transmitir o arquivo MP3 recém-baixado como resposta
     const mp3Buffer = fs.readFileSync(localFilePath)
-    console.log('🚀 ~ file: create-transcription.ts:39 ~ app.post ~ mp3Buffer:', mp3Buffer)
     const readableStream = Readable.from(mp3Buffer)
-    console.log(
-      '🚀 ~ file: create-transcription.ts:41 ~ app.post ~ readableStream:',
-      readableStream,
-    )
+
     await pipelineAsync(readableStream, reply.raw)
 
     const tempDirectory = path.join(__dirname, '../../tmp')
     const fileName = 'temp.mp3'
-    const videoPath = tempDirectory + fileName
+
     const audioReadStream = createReadStream(localFilePath)
 
     const response = await openai.audio.transcriptions.create({
@@ -57,7 +60,9 @@ export async function createVideoTranscription(app: FastifyInstance) {
       response_format: 'json',
       prompt,
     })
+
     const transcription = response.text
+
     await prisma.video.update({
       where: {
         id: videoId,
@@ -66,6 +71,6 @@ export async function createVideoTranscription(app: FastifyInstance) {
         transcription,
       },
     })
-    return { transcription }
+    return { transcription, videoId, prompt }
   })
 }

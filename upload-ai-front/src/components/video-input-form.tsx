@@ -3,7 +3,7 @@ import { Separator } from '@radix-ui/react-separator'
 import { FileVideo, Upload } from 'lucide-react'
 import { Button } from './ui/button'
 import { Textarea } from './ui/textarea'
-import { ChangeEvent, FormEvent, useMemo, useRef, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { getFFmpeg } from '@/lib/ffmpeg'
 import { fetchFile } from '@ffmpeg/util'
 import { api } from '@/lib/axios'
@@ -11,6 +11,7 @@ import { api } from '@/lib/axios'
 interface VideoInputFormProps {
   onVideoIdSelect: (videoId: string) => void
 }
+type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success'
 
 const statusMessages = {
   converting: 'Convertendo...',
@@ -18,13 +19,13 @@ const statusMessages = {
   generating: 'Transcrevendo...',
   success: 'Sucesso!',
 }
-type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success'
 
 export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [status, setStatus] = useState<Status>('waiting')
 
   const promptInputRef = useRef<HTMLTextAreaElement>(null)
+
   function handleFileSelected(event: ChangeEvent<HTMLInputElement>) {
     const { files } = event.currentTarget
 
@@ -67,9 +68,11 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
     const data = await ffmpeg.readFile('output.mp3')
 
     const audioFileBlob = new Blob([data], { type: 'audio/mpeg' })
+
     const audioFile = new File([audioFileBlob], 'audio.mp3', { type: 'audio/mpeg' })
 
     console.log('convert finish')
+
     return audioFile
   }
   async function handleUploadVideo(event: FormEvent<HTMLFormElement>) {
@@ -79,34 +82,41 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
 
     if (!videoFile) return
 
-    setStatus('converting')
+    try {
+      setStatus('converting')
 
-    const audioFile = await convertVideoToAudio(videoFile)
+      const audioFile = await convertVideoToAudio(videoFile)
 
-    const data = new FormData()
+      const data = new FormData()
+      console.log('🚀 ~ file: video-input-form.tsx:91 ~ handleUploadVideo ~ data:', data)
 
-    data.append('file', audioFile)
+      data.append('file', audioFile)
 
-    setStatus('uploading')
+      setStatus('uploading')
 
-    const response = await api.post('/video', data)
+      const response = await api.post('/video', data)
+      console.log('🚀 ~ file: video-input-form.tsx:96 ~ handleUploadVideo ~ response:', response)
 
-    const videoId = response.data.video.id
+      const videoId = response.data.video.id
+      console.log('🚀 ~ file: video-input-form.tsx:99 ~ handleUploadVideo ~ videoId:', videoId)
 
-    setStatus('generating')
+      setStatus('generating')
 
-    const dataTranscription = await api.post(`/video/${videoId}/transcription`, {
-      prompt,
-    })
+      const dataTranscription = await api.post(`/video/${videoId}/transcription`, {
+        prompt,
+      })
 
-    console.log(
-      '🚀 ~ file: video-input-form.tsx:78 ~ handleUploadVideo ~ dataTranscription:',
-      dataTranscription,
-    )
+      console.log(
+        '🚀 ~ file: video-input-form.tsx:78 ~ handleUploadVideo ~ dataTranscription:',
+        dataTranscription,
+      )
 
-    setStatus('success')
+      setStatus('success')
 
-    onVideoIdSelect(videoId)
+      onVideoIdSelect(videoId)
+    } catch (error) {
+      console.log('🚀 ~ file: video-input-form.tsx:117 ~ handleUploadVideo ~ error:', error)
+    }
   }
 
   const previewFile = useMemo(() => {
@@ -114,6 +124,17 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
       return null
     }
     return URL.createObjectURL(videoFile)
+  }, [videoFile])
+
+  useEffect(() => {
+    if (!videoFile) return
+
+    setStatus('waiting')
+    // clear the promptInputRef;
+
+    if (promptInputRef?.current) {
+      promptInputRef.current.value = ''
+    }
   }, [videoFile])
 
   return (
