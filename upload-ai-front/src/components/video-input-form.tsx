@@ -187,13 +187,9 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
         {status !== 'waiting' ? (
           <>
             {statusMessages[status]}
-<<<<<<< HEAD
             {status !== 'success' && (
               <span className='ml-2 inline-block h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]'></span>
             )}
-=======
-            <span className='ml-2 inline-block h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]'></span>
->>>>>>> 2996124c3856291959fd91930a0b5619ba28fb04
           </>
         ) : (
           <>

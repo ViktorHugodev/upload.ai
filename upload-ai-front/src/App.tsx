@@ -35,10 +35,7 @@ export function App() {
       },
     },
   )
-<<<<<<< HEAD
   console.log('🚀 ~ file: app.tsx:27 ~ App ~ handleSubmit:', handleSubmit)
-=======
->>>>>>> 2996124c3856291959fd91930a0b5619ba28fb04
 
   console.log('🚀 ~ file: app.tsx:27 ~ App ~ isLoading:', isLoading)
   return (
