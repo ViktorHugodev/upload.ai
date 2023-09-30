@@ -5,6 +5,7 @@ import { openai } from '../lib/openai'
 import { streamToResponse, OpenAIStream } from 'ai'
 export async function generateAiCompilationRoute(app: FastifyInstance) {
   app.post('/ai/openai', async (req, reply) => {
+    console.log('🚀 ~ file: generate-ai-compilation.ts:8 ~ app.post ~ req:', req.body)
     const bodySchema = z.object({
       videoId: z.string().uuid(),
       prompt: z.string(),
@@ -12,12 +13,14 @@ export async function generateAiCompilationRoute(app: FastifyInstance) {
     })
 
     const { temperature, prompt, videoId } = bodySchema.parse(req.body)
+    console.log('🚀 ~ file: generate-ai-compilation.ts:15 ~ app.post ~ req.body:', req.body)
 
     const video = await prisma.video.findUniqueOrThrow({
       where: {
         id: videoId,
       },
     })
+    console.log('🚀 ~ file: generate-ai-compilation.ts:21 ~ app.post ~ video:', video)
 
     if (!video.transcription) {
       return reply.status(400).send({ error: 'Video has no transcription yet' })
@@ -37,7 +40,7 @@ export async function generateAiCompilationRoute(app: FastifyInstance) {
     streamToResponse(stream, reply.raw, {
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'GET, POST, PUT, DELETE',
+        'Access-Control-Allow-Credentials': 'GET,PUT,POST,DELETE,OPTIONS',
       },
     })
   })
