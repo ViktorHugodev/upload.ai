@@ -25,9 +25,6 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [status, setStatus] = useState<Status>('waiting')
 
-  useEffect(() => {
-    api.get('test-cors').then(res => console.log('CORS:', res))
-  }, [])
   const promptInputRef = useRef<HTMLTextAreaElement>(null)
 
   function handleFileSelected(event: ChangeEvent<HTMLInputElement>) {
