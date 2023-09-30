@@ -6,20 +6,20 @@ POST http://localhost:3333/video
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="file"; filename="HeJ-obrigado.mp3"
+Content-Disposition: form-data; name="file"; filename="tmp.mp3"
 Content-Type: audio/mpeg
 
-< ./HeJ-obrigado.mp3
+< ./tmp.mp3
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 
 ###
-POST http://localhost:3333/video/92d25227-a64e-4c99-9301-eefb91d439dc/transcription
+POST http://localhost:3333/video/e0fd54f3-d517-43ce-918e-f61f0de24e56/transcription
 Content-Type: application/json
 
 {
-  "prompt": "cientistas, descobertas, vírus",
-  "videoId": "92d25227-a64e-4c99-9301-eefb91d439dc"
+  "prompt": "teste, nova rota",
+  "videoId": "e0fd54f3-d517-43ce-918e-f61f0de24e56"
 }
 
 ###

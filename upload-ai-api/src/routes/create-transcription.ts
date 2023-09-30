@@ -9,68 +9,71 @@ import { downloadMP3FromS3, localFilePath } from '../lib/s3'
 import { Readable, pipeline } from 'stream'
 import { promisify } from 'node:util'
 import * as fs from 'fs'
+import fastifyCors from '@fastify/cors'
 
 const pipelineAsync = promisify(pipeline)
 export async function createVideoTranscription(app: FastifyInstance) {
-  app.post('/video/:videoId/transcription', async (req, reply) => {
-    reply.header('Access-Control-Allow-Origin', '*')
-    reply.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    reply.header('Access-Control-Allow-Headers', '*')
-    const paramsSchema = z.object({
-      videoId: z.string().uuid(),
-    })
-    const bodySchema = z.object({
-      prompt: z.string(),
-    })
+  app.post(
+    '/video/:videoId/transcription',
 
-    const { videoId } = paramsSchema.parse(req.params)
-    const { prompt } = bodySchema.parse(req.body)
-    console.log('🚀 ~ file: create-transcription.ts:25 ~ app.post ~ prompt-videoId:', {
-      prompt,
-      videoId,
-    })
+    async (req, reply) => {
+      // reply.header('Access-Control-Allow-Origin', '*')
+      // reply.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+      // reply.header('Access-Control-Allow-Headers', '*')
+      const paramsSchema = z.object({
+        videoId: z.string().uuid(),
+      })
+      const bodySchema = z.object({
+        prompt: z.string(),
+      })
 
-    const video = await prisma.video.findUniqueOrThrow({
-      where: {
-        id: videoId,
-      },
-    })
-    console.log('🚀 ~ file: create-transcription.ts:32 ~ app.post ~ video:', video)
+      const { videoId } = paramsSchema.parse(req.params)
+      const { prompt } = bodySchema.parse(req.body)
 
-    const s3ObjectKey = video.key as string
+      const video = await prisma.video.findUniqueOrThrow({
+        where: {
+          id: videoId,
+        },
+      })
 
-    await downloadMP3FromS3(s3ObjectKey)
+      const s3ObjectKey = video.key as string
 
-    // Transmitir o arquivo MP3 recém-baixado como resposta
-    const mp3Buffer = fs.readFileSync(localFilePath)
-    const readableStream = Readable.from(mp3Buffer)
+      await downloadMP3FromS3(s3ObjectKey)
 
-    await pipelineAsync(readableStream, reply.raw)
+      // Transmitir o arquivo MP3 recém-baixado como resposta
+      const mp3Buffer = fs.readFileSync(localFilePath)
+      const readableStream = Readable.from(mp3Buffer)
 
-    const tempDirectory = path.join(__dirname, '../../tmp')
-    const fileName = 'temp.mp3'
+      // await pipelineAsync(readableStream, reply.raw)
 
-    const audioReadStream = createReadStream(localFilePath)
+      const audioReadStream = createReadStream(localFilePath)
+      console.log('Iniciando chamada à API da OpenAI...')
+      try {
+        const response = await openai.audio.transcriptions.create({
+          file: audioReadStream,
+          model: 'whisper-1',
+          language: 'pt',
+          temperature: 0,
+          response_format: 'json',
+          prompt,
+        })
+        const transcription = response.text
 
-    const response = await openai.audio.transcriptions.create({
-      file: audioReadStream,
-      model: 'whisper-1',
-      language: 'pt',
-      temperature: 0,
-      response_format: 'json',
-      prompt,
-    })
+        const statusUpdate = await prisma.video.update({
+          where: {
+            id: videoId,
+          },
+          data: {
+            transcription,
+          },
+        })
+        console.log('🚀 ~ file: create-transcription.ts:70 ~ statusUpdate:', statusUpdate)
 
-    const transcription = response.text
-
-    await prisma.video.update({
-      where: {
-        id: videoId,
-      },
-      data: {
-        transcription,
-      },
-    })
-    return { transcription, videoId, prompt }
-  })
+        return { transcription, videoId, prompt }
+      } catch (error) {
+        console.log('Erro ao chamar a API da OpenAI:', error)
+        return reply.status(500).send({ error: error })
+      }
+    },
+  )
 }

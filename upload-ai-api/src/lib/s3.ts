@@ -41,7 +41,7 @@ export async function downloadMP3FromS3(objectKey: string): Promise<void> {
 
     // Salvar o arquivo MP3 localmente
     fs.writeFileSync(localFilePath, mp3Data)
-    console.log('ln 60 localGile mp3Data', { localFilePath, mp3Data })
+    console.log('música baixada', { localFilePath })
   } catch (error) {
     console.error(`Erro ao baixar o arquivo MP3: ${error}`)
     throw error
