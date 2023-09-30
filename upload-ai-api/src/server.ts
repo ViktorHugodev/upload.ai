@@ -13,7 +13,9 @@ app.register(fastifyCors, {
   methods: 'GET,PUT,POST,DELETE,OPTIONS',
   allowedHeaders: '*',
 })
-
+app.get('/test-cors', async (req, reply) => {
+  reply.send({ message: 'CORS should work' })
+})
 app.register(getAllPrompt)
 app.register(uploadVideo)
 app.register(createVideoTranscription)

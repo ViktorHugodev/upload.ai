@@ -10,6 +10,7 @@ import { api } from '@/lib/axios'
 
 interface VideoInputFormProps {
   onVideoIdSelect: (videoId: string) => void
+  isGenerating: boolean
 }
 type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success'
 
@@ -24,6 +25,9 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [status, setStatus] = useState<Status>('waiting')
 
+  useEffect(() => {
+    api.get('test-cors').then(res => console.log('CORS:', res))
+  }, [])
   const promptInputRef = useRef<HTMLTextAreaElement>(null)
 
   function handleFileSelected(event: ChangeEvent<HTMLInputElement>) {
@@ -88,26 +92,22 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
       const audioFile = await convertVideoToAudio(videoFile)
 
       const data = new FormData()
-      console.log('🚀 ~ file: video-input-form.tsx:91 ~ handleUploadVideo ~ data:', data)
 
       data.append('file', audioFile)
 
       setStatus('uploading')
 
       const response = await api.post('/video', data)
-      console.log('🚀 ~ file: video-input-form.tsx:96 ~ handleUploadVideo ~ response:', response)
 
       const videoId = response.data.video.id
-      console.log('🚀 ~ file: video-input-form.tsx:99 ~ handleUploadVideo ~ videoId:', videoId)
 
       setStatus('generating')
 
       const dataTranscription = await api.post(`/video/${videoId}/transcription`, {
         prompt,
       })
-
       console.log(
-        '🚀 ~ file: video-input-form.tsx:78 ~ handleUploadVideo ~ dataTranscription:',
+        '🚀 ~ file: video-input-form.tsx:105 ~ handleUploadVideo ~ dataTranscription:',
         dataTranscription,
       )
 
@@ -181,10 +181,14 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
         data-success={status === 'success'}
         disabled={status !== 'waiting'}
         type='submit'
-        className='w-full data-[success=true]:bg-emerald-400'
+        className='w-full data-[success=true]:bg-emerald-400
+       '
       >
         {status !== 'waiting' ? (
-          statusMessages[status]
+          <>
+            {statusMessages[status]}
+            <span className='ml-2 inline-block h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]'></span>
+          </>
         ) : (
           <>
             Carregar vídeo

@@ -5,6 +5,7 @@ import { openai } from '../lib/openai'
 import { streamToResponse, OpenAIStream } from 'ai'
 export async function generateAiCompilationRoute(app: FastifyInstance) {
   app.post('/ai/openai', async (req, reply) => {
+    console.log('🚀 ~ file: generate-ai-compilation.ts:8 ~ app.post ~ req:', req.body)
     const bodySchema = z.object({
       videoId: z.string().uuid(),
       prompt: z.string(),

@@ -13,26 +13,25 @@ export async function uploadVideo(app: FastifyInstance) {
   })
 
   app.post('/video', async (request, reply) => {
-    const data = await request.file()
-
-    if (!data) {
-      return reply.status(400).send({ error: 'Missing file input' })
-    }
-
-    const extension = path.extname(data.filename)
-
-    if (extension !== '.mp3') {
-      return reply.status(400).send({ error: 'Invalid file extension, please upload an MP3' })
-    }
-
-    const fileBaseName = path.basename(data.filename, extension)
-    const fileUploadName = `${fileBaseName}-${Date.now()}${extension}`
-
-    console.log('🚀 ~ file: post-video.ts:31 ~ app.post ~ fileUploadName:', fileUploadName)
-    // Faça o upload do fluxo de dados diretamente para o Amazon S3 usando a função uploadFileS3
     try {
+      const data = await request.file()
+
+      if (!data) {
+        return reply.status(400).send({ error: 'Missing file input' })
+      }
+
+      const extension = path.extname(data.filename)
+
+      if (extension !== '.mp3') {
+        return reply.status(400).send({ error: 'Invalid file extension, please upload an MP3' })
+      }
+
+      const fileBaseName = path.basename(data.filename, extension)
+      const fileUploadName = `${fileBaseName}-${Date.now()}${extension}`
+
+      console.log('🚀 ~ file: post-video.ts:31 ~ app.post ~ fileUploadName:', fileUploadName)
+      // Faça o upload do fluxo de dados diretamente para o Amazon S3 usando a função uploadFileS3
       const s3upload = await uploadFileS3(data.file, fileUploadName)
-      console.log('🚀 ~ file: post-video.ts:39 ~ app.post ~ s3upload:', s3upload)
 
       const video = await prisma.video.create({
         data: {
