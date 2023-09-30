@@ -21,10 +21,11 @@ import { useCompletion } from 'ai/react'
 export function App() {
   const [temperature, setTemperature] = useState(0.5)
   const [videoId, setVideoId] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const { input, setInput, handleInputChange, handleSubmit, completion, isLoading } = useCompletion(
     {
-      api: 'http://localhost:3333/ai/openai',
+      api: `${import.meta.env.VITE_BASEURL}/ai/openai`,
       body: {
         videoId,
         temperature,
@@ -34,9 +35,9 @@ export function App() {
       },
     },
   )
-  console.log('🚀 ~ file: app.tsx:25 ~ App ~  input:', input)
-  console.log('🚀 ~ file: app.tsx:25 ~ App ~  isLoading:', isLoading)
-  console.log('🚀 ~ file: app.tsx:25 ~ App ~  completion:', completion)
+  console.log('🚀 ~ file: app.tsx:27 ~ App ~ handleSubmit:', handleSubmit)
+
+  console.log('🚀 ~ file: app.tsx:27 ~ App ~ isLoading:', isLoading)
   return (
     <div className='min-h-screen flex flex-col'>
       <div className='px-6 py-3 flex items-center justify-between border-b'>
@@ -44,13 +45,15 @@ export function App() {
 
         <div className='flex items-center gap-3 '>
           <span className='text-sm text-muted-foreground'>
-            IA desenvolvida para ajudar você a fazer seus uploads
+            Resuma vídeos, crie títulos e descrições chamativas para seus posts.
           </span>
           <Separator orientation='vertical' className='h-6' />
-          <Button variant='outline' className='hover:bg-primary/10'>
-            <Github className='w-4 h-4 mr-3' />
-            Github
-          </Button>
+          <a href='https://github.com/ViktorHugodev'>
+            <Button variant='outline' className='hover:bg-primary/10'>
+              <Github className='w-4 h-4 mr-3' />
+              Github
+            </Button>
+          </a>
         </div>
       </div>
       <main className='flex-1 p-6 gap-6 flex'>
@@ -58,7 +61,7 @@ export function App() {
           <div className='grid grid-rows-2 gap-4 flex-1 '>
             <Textarea
               className='resize-none p-4 leading-relaxed'
-              placeholder='Inclua o prompt para a IA'
+              placeholder='Inclua o prompt para a IA, são as palavras chave para uma maior acertabilidade da ferramenta'
               value={input}
               onChange={handleInputChange}
             />
@@ -69,13 +72,13 @@ export function App() {
               value={completion}
             />
           </div>
-          <p className='text-sm text-muted-foreground'>
+          <p className='text-sm text-muted-foreground mt-2'>
             Lembre-se você pode utilizar a variável
-            <code className='text-green-500'>{'{transcription}'}</code>
+            <code className='text-green-500'>{' {transcription}'}</code>
           </p>
         </div>
         <aside className='w-80 space-y-6'>
-          <VideoInputForm onVideoIdSelect={setVideoId} />
+          <VideoInputForm onVideoIdSelect={setVideoId} isGenerating={isGenerating} />
 
           <Separator />
 

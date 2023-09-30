@@ -42,6 +42,6 @@ export async function createVideoTranscription(app: FastifyInstance) {
         transcription,
       },
     })
-    return { transcription }
+    return { transcription, videoId, prompt }
   })
 }
