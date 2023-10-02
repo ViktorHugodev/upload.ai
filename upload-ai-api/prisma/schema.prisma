@@ -14,7 +14,7 @@ model Video {
   id            String   @id @default(uuid())
   name          String
   path          String
-  transcription String?
+  transcription String?  @db.Text
   createdAt     DateTime @default(now())
   key           String?
 }
@@ -22,5 +22,5 @@ model Video {
 model Prompt {
   id       String @id @default(uuid())
   title    String
-  template String
+  template String @db.Text
 }
