@@ -29,7 +29,6 @@ export async function uploadVideo(app: FastifyInstance) {
       const fileBaseName = path.basename(data.filename, extension)
       const fileUploadName = `${fileBaseName}-${Date.now()}${extension}`
 
-      console.log('🚀 ~ file: post-video.ts:31 ~ app.post ~ fileUploadName:', fileUploadName)
       // Faça o upload do fluxo de dados diretamente para o Amazon S3 usando a função uploadFileS3
       const s3upload = await uploadFileS3(data.file, fileUploadName)
 

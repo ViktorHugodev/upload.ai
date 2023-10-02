@@ -1,8 +1,8 @@
-import { prisma } from './../lib/prisma'
+import { OpenAIStream, streamToResponse } from 'ai'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { openai } from '../lib/openai'
-import { streamToResponse, OpenAIStream } from 'ai'
+import { prisma } from './../lib/prisma'
 export async function generateAiCompilationRoute(app: FastifyInstance) {
   app.post('/ai/openai', async (req, reply) => {
     console.log('🚀 ~ file: generate-ai-compilation.ts:8 ~ app.post ~ req:', req.body)
@@ -13,14 +13,12 @@ export async function generateAiCompilationRoute(app: FastifyInstance) {
     })
 
     const { temperature, prompt, videoId } = bodySchema.parse(req.body)
-    console.log('🚀 ~ file: generate-ai-compilation.ts:15 ~ app.post ~ req.body:', req.body)
 
     const video = await prisma.video.findUniqueOrThrow({
       where: {
         id: videoId,
       },
     })
-    console.log('🚀 ~ file: generate-ai-compilation.ts:21 ~ app.post ~ video:', video)
 
     if (!video.transcription) {
       return reply.status(400).send({ error: 'Video has no transcription yet' })
