@@ -10,7 +10,6 @@ import { api } from '@/lib/axios'
 
 interface VideoInputFormProps {
   onVideoIdSelect: (videoId: string) => void
-  isGenerating: boolean
 }
 type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success'
 
@@ -100,7 +99,7 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
 
       setStatus('generating')
 
-      const dataTranscription = await api.post(`/video/${videoId}/transcription`, {
+      await api.post(`/video/${videoId}/transcription`, {
         prompt,
       })
 

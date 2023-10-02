@@ -21,7 +21,6 @@ import { useCompletion } from 'ai/react'
 export function App() {
   const [temperature, setTemperature] = useState(0.5)
   const [videoId, setVideoId] = useState<string | null>(null)
-  const [isGenerating, setIsGenerating] = useState(false)
 
   const { input, setInput, handleInputChange, handleSubmit, completion, isLoading } = useCompletion(
     {
@@ -75,7 +74,7 @@ export function App() {
           </p>
         </div>
         <aside className='w-80 space-y-6'>
-          <VideoInputForm onVideoIdSelect={setVideoId} isGenerating={isGenerating} />
+          <VideoInputForm onVideoIdSelect={setVideoId} />
 
           <Separator />
 
