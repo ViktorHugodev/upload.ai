@@ -195,7 +195,7 @@ Desenvolvido com 💚 por <a href="https://github.com/viktorhugodev/">Victor Hug
 
 <div style="display: flex;">
   <a href="https://www.linkedin.com/in/viktorhugodev/" target="_blank">
-  <img src="" style="margin-right: 2vw" target="_blank"></a>
+  <img src="https://github.com/ViktorHugodev/upload.ai/assets/85125378/d382b3dc-e5a9-4888-85e5-92a1c04bd315" style="margin-right: 2vw; height:20px" target="_blank"></a>
   <a href="mailto:viktorhugo.dev@gmail.com">
-  <img src="" alt="Gmail" style="margin-right: 2vw"/></a>
+  <img src="https://github.com/ViktorHugodev/upload.ai/assets/85125378/db37cd4a-80ec-4ed7-bf48-a0cd133abcfc" alt="Gmail" style="margin-right: 2vw; height:20px"/></a>
 </div>
