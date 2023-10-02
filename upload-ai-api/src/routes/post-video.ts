@@ -1,9 +1,9 @@
 import 'dotenv/config'
-import { prisma } from './../lib/prisma'
-import { FastifyInstance } from 'fastify'
 import { fastifyMultipart } from '@fastify/multipart'
+import { FastifyInstance } from 'fastify'
 import path from 'node:path'
-import { s3, uploadFileS3 } from '../lib/s3'
+import { uploadFileS3 } from '../lib/s3'
+import { prisma } from './../lib/prisma'
 
 export async function uploadVideo(app: FastifyInstance) {
   app.register(fastifyMultipart, {

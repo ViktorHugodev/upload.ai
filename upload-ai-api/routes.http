@@ -31,3 +31,12 @@ Content-Type: application/json
   "videoId":"b33f51cf-e2cf-49d5-ad68-558cd03ceacc",
   "prompt": "Gere um resumo da transcrição do vídeo informada a seguir: '''{transcription}'''"
 }
+
+###
+POST http://localhost:3333/create-prompt
+Content-Type: application/json
+
+{
+  "title":"Resumir o áudio",
+  "string":"Criar um resumo sucinto da transcrição.  O resumo não deve passar de 1500 caracteres."
+}

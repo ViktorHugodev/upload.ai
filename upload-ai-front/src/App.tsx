@@ -35,9 +35,6 @@ export function App() {
       },
     },
   )
-  console.log('🚀 ~ file: app.tsx:27 ~ App ~ handleSubmit:', handleSubmit)
-
-  console.log('🚀 ~ file: app.tsx:27 ~ App ~ isLoading:', isLoading)
   return (
     <div className='min-h-screen flex flex-col'>
       <div className='px-6 py-3 flex items-center justify-between border-b'>

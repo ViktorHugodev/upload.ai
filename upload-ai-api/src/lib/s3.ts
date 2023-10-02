@@ -1,6 +1,6 @@
+import { S3 } from 'aws-sdk'
 import 'dotenv/config'
 import fs from 'node:fs'
-import { S3 } from 'aws-sdk'
 import path from 'node:path'
 
 const bucketName = process.env.AWS_BUCKET_NAME as string

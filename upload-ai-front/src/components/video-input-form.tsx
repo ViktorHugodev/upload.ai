@@ -103,10 +103,6 @@ export function VideoInputForm({ onVideoIdSelect }: VideoInputFormProps) {
       const dataTranscription = await api.post(`/video/${videoId}/transcription`, {
         prompt,
       })
-      console.log(
-        '🚀 ~ file: video-input-form.tsx:105 ~ handleUploadVideo ~ dataTranscription:',
-        dataTranscription,
-      )
 
       setStatus('success')
 
