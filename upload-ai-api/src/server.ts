@@ -29,9 +29,9 @@ app.register(uploadVideo)
 app.register(createVideoTranscription)
 app.register(generateAiCompilationRoute)
 app.register(createPrompt)
-
+const port = Number(process.env.PORT) || 3006
 app
   .listen({
-    port: 3333,
+    port: port,
   })
   .then(() => console.log('Listening on port 3333!'))
