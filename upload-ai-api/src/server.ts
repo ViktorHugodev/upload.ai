@@ -15,6 +15,10 @@ app.register(fastifyCors, {
   methods: 'GET,PUT,POST,DELETE,OPTIONS',
   allowedHeaders: '*',
 })
+app.get('/', (req, reply) => {
+  reply.send({ success: true })
+})
+
 app.get('/test', (req, reply) => {
   return reply.send({
     message: 'Hello world',
