@@ -2,6 +2,7 @@ import { S3 } from 'aws-sdk'
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
+import { Readable } from 'stream'
 
 const bucketName = process.env.AWS_BUCKET_NAME as string
 const region = process.env.AWS_REGION
@@ -14,7 +15,7 @@ export const s3 = new S3({
   secretAccessKey,
 })
 
-export async function uploadFileS3(binaryData: Buffer, key: string) {
+export async function uploadFileS3(binaryData: Readable, key: string) {
   const uploadParams = {
     Bucket: bucketName,
     Body: binaryData,

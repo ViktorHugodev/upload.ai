@@ -3,12 +3,10 @@ import { fastify } from 'fastify'
 import { getAllPrompt } from './routes/get-all-prompts'
 import { uploadVideo } from './routes/post-video'
 import { createVideoTranscription } from './routes/create-transcription'
-import {
-  generateAiCompilationRoute,
-  generateAiCompilationRoute,
-} from './routes/generate-ai-compilation'
+
 import fastifyCors from '@fastify/cors'
 import { createPrompt } from './routes/create-prompt'
+import { generateAiCompilationRoute } from './routes/generate-ai-compilation'
 
 const app = fastify()
 

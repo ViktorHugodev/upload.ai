@@ -36,7 +36,7 @@ export async function uploadVideo(app: FastifyInstance) {
         data: {
           name: data.filename,
           path: s3upload.Location,
-          key: s3upload.key,
+          key: s3upload.Key,
         },
       })
 
