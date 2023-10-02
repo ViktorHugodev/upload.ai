@@ -35,8 +35,14 @@ export async function createVideoTranscription(app: FastifyInstance) {
 
       await downloadMP3FromS3(s3ObjectKey)
 
-      const mp3Buffer = fs.readFileSync(localFilePath)
-      const readableStream = Readable.from(mp3Buffer)
+      if (fs.existsSync(localFilePath)) {
+        const mp3Buffer = fs.readFileSync(localFilePath)
+        // Seu código aqui
+        const readableStream = Readable.from(mp3Buffer)
+      } else {
+        console.log(`Arquivo não encontrado: ${localFilePath}`)
+        // Tratamento de erro adicional aqui
+      }
 
       // await pipelineAsync(readableStream, reply.raw)
 
