@@ -8,7 +8,7 @@ import fastifyCors from '@fastify/cors'
 import { createPrompt } from './routes/create-prompt'
 import { generateAiCompilationRoute } from './routes/generate-ai-compilation'
 
-const app = fastify()
+const app = fastify({})
 
 app.register(fastifyCors, {
   origin: '*',
@@ -34,4 +34,4 @@ app
   .listen({
     port: port,
   })
-  .then(() => console.log('Listening on port 3333!'))
+  .then(() => console.log('Listening on port !', port))
