@@ -15,7 +15,11 @@ app.register(fastifyCors, {
   methods: 'GET,PUT,POST,DELETE,OPTIONS',
   allowedHeaders: '*',
 })
-
+app.get('/test', (req, reply) => {
+  return reply.send({
+    message: 'Hello world',
+  })
+})
 app.register(getAllPrompt)
 app.register(uploadVideo)
 app.register(createVideoTranscription)
